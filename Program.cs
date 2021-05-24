@@ -7,7 +7,7 @@ namespace Скрипт_создания_папки_ежедневки
     {
         static void Main(string[] args)
         {
-            string[] paths = { "C:\\Users\\osipov\\Downloads\\Filestack" };
+            string[] paths = { @"C:\Users\osipov\Downloads\Filestack" };
 
             foreach (string path in paths)
             {
@@ -29,10 +29,32 @@ namespace Скрипт_создания_папки_ежедневки
         // that are found, and process the files they contain.
         public static void ProcessDirectory(string targetDirectory)
         {
-            // Recurse into subdirectories of this directory.
+            // Get current date and prepare it to be a foldername
+            DateTime currentDateTime = DateTime.Now;
+            string newFolderName = currentDateTime.ToString("yyyy-MM-dd");
+
+            // Set flag to check all the array
+            bool isSuchFolderHere = false;
+
+            // Search directory
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
-            foreach (string subdirectory in subdirectoryEntries)
+            foreach (string subdirectory in subdirectoryEntries) 
+            {
                 Console.WriteLine(subdirectory);
+                if (subdirectory.Contains(newFolderName))
+                {
+                    Console.WriteLine($"Folder {newFolderName} already exists.");
+                    isSuchFolderHere = true;
+                    break;
+                }
+            }
+
+            // Create new one if it does not exists
+            if (!isSuchFolderHere)
+            {
+                string path = String.Join('\\', targetDirectory, newFolderName);
+                System.IO.Directory.CreateDirectory(path);
+            }
         }
     }
 }
