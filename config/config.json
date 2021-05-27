@@ -1,0 +1,7 @@
+{
+  "DeleteEmpty": true,
+  "DeleteOlder": false,
+  "FolderMask": "yyyy-MM-dd",
+  "Path": "C:\\Users\\osipov\\Downloads\\Filestack",
+  "SavePeriod": 30
+}
