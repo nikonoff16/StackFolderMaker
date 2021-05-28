@@ -3,5 +3,5 @@
   "DeleteOlder": false,
   "FolderMask": "yyyy-MM-dd",
   "Path": "C:\\Users\\osipov\\Downloads\\Filestack",
-  "SavePeriod": 30
+  "SavePeriod": 30.0
 }

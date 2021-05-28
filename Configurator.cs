@@ -7,10 +7,14 @@ namespace Скрипт_создания_папки_ежедневки
 {
     class Configurator
     {
+        /**
+         * Класс для чтения в него информации из json-конфига. Запускается из конструктора класса FolderMaker
+         * Требует наличия файла конфигурации 'config.json' в корне приложения.
+         */
         public string Path { get; set; }
         public bool DeleteEmpty { get; set; }
         public string FolderMask { get; set; }
         public bool DeleteOlder { get; set; }
-        public int SavePeriod { get; set; }
+        public double SavePeriod { get; set; }
     }
 }

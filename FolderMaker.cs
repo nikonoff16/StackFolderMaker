@@ -8,15 +8,25 @@ namespace Скрипт_создания_папки_ежедневки
 {
     class FolderMaker
     {
+        /**
+         * Класс выполняет работу с папками согласно записям в конфигурационном файле.
+         * Входная точка для вызывающего класс кода - метод 'start'.
+         */
         private Configurator configuration;
         public FolderMaker(string configPath)
         {
+            /**
+             * Считываем конфигурацию из файла 'config.json'
+             */
             string jsonString = File.ReadAllText(configPath);
             configuration = JsonSerializer.Deserialize<Configurator>(jsonString);
         }
 
         private void CreateFolder(string path, string name)
         {
+            /**
+             * Создание подпапки с именем name в папке path.
+             */
             path = String.Join('\\', path, name);
             try
             {
@@ -31,6 +41,9 @@ namespace Скрипт_создания_папки_ежедневки
 
         private void DeleteFolder(string path)
         {
+            /**
+             * Безвозвратное рекурсивное удаление папки, переданной в параметре path
+             */
             try
             {
                 Directory.Delete(path, true);
@@ -44,6 +57,9 @@ namespace Скрипт_создания_папки_ежедневки
 
         private bool IsFolderEmpty(string path)
         {
+            /**
+             * Проверка наличия файлов и папок в указанной директории
+             */
             string[] files = Directory.GetFiles(path);
             string[] folders = Directory.GetDirectories(path);
 
@@ -61,18 +77,37 @@ namespace Скрипт_создания_папки_ежедневки
 
         private bool IsFolderOld(string directoryPath, string subdirectoryPath, DateTime currentDate)
         {
-            // Adding symbol to correctly retrieve date from subdirectory folder
+            /**
+             * Проверка того, считается ли папка подлежащей удалению из-за срока давности, указанного в параметере SavePeriod
+             * Исхожу из соображения, что имя папки создается с именем даты в неком формате.
+             */
             directoryPath += @"\";
             string folderDate = subdirectoryPath.Replace(directoryPath, "");
-            //Console.WriteLine($"Извлечена дата из адреса - {folderDate}");
 
-            // TODO: сделать проверку на неправильные значения (или проверить, как себя программа с ними будет вести)
-            // TODO: написать непосредственную проверку разницы во времени в днях.
+            try
+            {
+                var oldDate = DateTime.Parse(folderDate);
+                double delta = (currentDate - oldDate).TotalDays;
+
+                if (delta > configuration.SavePeriod)
+                {
+                    Console.WriteLine($"Обнаружена старая папка, {subdirectoryPath}");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Папка {folderDate} не относится к сгенерированным автоматически ({e}.");
+                return false;
+            }
             return false;
         }
 
-        public void test()
+        public void start()
         {
+            /**
+             * Входная точка в приложение, единственный публичный метод класса.
+             */
             var currentDateTime = DateTime.Now;
             var newFolderName = currentDateTime.ToString(configuration.FolderMask);
 
@@ -82,15 +117,14 @@ namespace Скрипт_создания_папки_ежедневки
             {
                 bool isEmpty = IsFolderEmpty(item);
                 bool isOld = IsFolderOld(configuration.Path, item, currentDateTime);
-                if (isEmpty && configuration.DeleteEmpty)
+
+                bool isPermittedToDelete = (isEmpty && configuration.DeleteEmpty) | (isOld && configuration.DeleteOlder);
+                if (isPermittedToDelete)
                 {
                     DeleteFolder(item);
                 }
             }
-            
-
             CreateFolder(configuration.Path, newFolderName);
-
         }
     }
 }
