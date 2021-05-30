@@ -6,6 +6,36 @@
     <RootNamespace>Скрипт_создания_папки_ежедневки</RootNamespace>
     <ApplicationIcon />
     <Win32Resource />
+    <StartupObject>Скрипт_создания_папки_ежедневки.Program</StartupObject>
+    <Version>2.0.1</Version>
+    <Authors>Осипов Виктор</Authors>
+    <Product>Утилита создания папки-ежедневки</Product>
+    <Description>Утилита создает и управляет временными папками для артефактов, которые образуются или скачиваются в течение дня.</Description>
+    <RepositoryUrl>https://github.com/nikonoff16/StackFolderMaker</RepositoryUrl>
+    <RepositoryType>Открытый</RepositoryType>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove=".gitattributes" />
+    <None Remove="config\config.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include=".gitattributes">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="config\config.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update=".gitignore">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

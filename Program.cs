@@ -7,7 +7,7 @@ namespace Скрипт_создания_папки_ежедневки
         static void Main(string[] args)
         {
             /**
-             * Версия 2.0.0
+             * Версия 2.0.1
              */
             FolderMaker runner = new FolderMaker(@"config.json");
             runner.start();

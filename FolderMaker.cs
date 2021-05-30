@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Text.Json;
 
@@ -24,7 +22,7 @@ namespace Скрипт_создания_папки_ежедневки
 
         private void CreateFolder(string path, string name)
         {
-            /**
+            /*
              * Создание подпапки с именем name в папке path.
              */
             path = String.Join('\\', path, name);
@@ -105,26 +103,33 @@ namespace Скрипт_создания_папки_ежедневки
 
         public void start()
         {
-            /**
+            /*
              * Входная точка в приложение, единственный публичный метод класса.
              */
             var currentDateTime = DateTime.Now;
             var newFolderName = currentDateTime.ToString(configuration.FolderMask);
 
             var folders = Directory.GetDirectories(configuration.Path);
+            var isTheDirectoryInPlace = false;
 
             foreach (var item in folders)
             {
-                bool isEmpty = IsFolderEmpty(item);
-                bool isOld = IsFolderOld(configuration.Path, item, currentDateTime);
+                var alreadyExists = item.Contains(newFolderName);
+                isTheDirectoryInPlace = (isTheDirectoryInPlace || alreadyExists);
+                var isEmpty = IsFolderEmpty(item);
+                var isOld = IsFolderOld(configuration.Path, item, currentDateTime);
 
-                bool isPermittedToDelete = (isEmpty && configuration.DeleteEmpty) | (isOld && configuration.DeleteOlder);
+                var isPermittedToDelete = (isEmpty && configuration.DeleteEmpty && !alreadyExists) | (isOld && configuration.DeleteOlder);
                 if (isPermittedToDelete)
                 {
                     DeleteFolder(item);
                 }
             }
-            CreateFolder(configuration.Path, newFolderName);
+
+            if (!isTheDirectoryInPlace)
+            {
+                CreateFolder(configuration.Path, newFolderName);
+            }
         }
     }
 }
