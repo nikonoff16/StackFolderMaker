@@ -3,11 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Скрипт_создания_папки_ежедневки</RootNamespace>
+    <RootNamespace>FolderMakerUtility</RootNamespace>
     <ApplicationIcon />
     <Win32Resource />
-    <StartupObject>Скрипт_создания_папки_ежедневки.Program</StartupObject>
-    <Version>2.0.1</Version>
+    <StartupObject>FolderMakerUtility.Program</StartupObject>
+    <Version>2.0.2</Version>
     <Authors>Осипов Виктор</Authors>
     <Product>Утилита создания папки-ежедневки</Product>
     <Description>Утилита создает и управляет временными папками для артефактов, которые образуются или скачиваются в течение дня.</Description>

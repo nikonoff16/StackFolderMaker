@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text.Json;
 
-namespace Скрипт_создания_папки_ежедневки
+namespace FolderMakerUtility
 {
-    class FolderMaker
+    internal class FolderMaker
     {
         /**
          * Класс выполняет работу с папками согласно записям в конфигурационном файле.
@@ -20,7 +20,7 @@ namespace Скрипт_создания_папки_ежедневки
             configuration = JsonSerializer.Deserialize<Configurator>(jsonString);
         }
 
-        private void CreateFolder(string path, string name)
+        private static void CreateFolder(string path, string name)
         {
             /*
              * Создание подпапки с именем name в папке path.
@@ -37,7 +37,7 @@ namespace Скрипт_создания_папки_ежедневки
             }
         }
 
-        private void DeleteFolder(string path)
+        private static void DeleteFolder(string path)
         {
             /**
              * Безвозвратное рекурсивное удаление папки, переданной в параметре path
@@ -53,7 +53,7 @@ namespace Скрипт_создания_папки_ежедневки
             }
         }
 
-        private bool IsFolderEmpty(string path)
+        private static bool IsFolderEmpty(string path)
         {
             /**
              * Проверка наличия файлов и папок в указанной директории
@@ -80,12 +80,12 @@ namespace Скрипт_создания_папки_ежедневки
              * Исхожу из соображения, что имя папки создается с именем даты в неком формате.
              */
             directoryPath += @"\";
-            string folderDate = subdirectoryPath.Replace(directoryPath, "");
+            var folderDate = subdirectoryPath.Replace(directoryPath, "");
 
             try
             {
                 var oldDate = DateTime.Parse(folderDate);
-                double delta = (currentDate - oldDate).TotalDays;
+                var delta = (currentDate - oldDate).TotalDays;
 
                 if (delta > configuration.SavePeriod)
                 {
@@ -101,7 +101,7 @@ namespace Скрипт_создания_папки_ежедневки
             return false;
         }
 
-        public void start()
+        public void Start()
         {
             /*
              * Входная точка в приложение, единственный публичный метод класса.
