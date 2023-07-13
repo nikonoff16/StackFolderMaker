@@ -6,25 +6,15 @@ namespace FolderMakerUtility
 {
     internal class FolderMaker
     {
-        /**
-         * Класс выполняет работу с папками согласно записям в конфигурационном файле.
-         * Входная точка для вызывающего класс кода - метод 'start'.
-         */
-        private Configurator configuration;
+        private readonly Configurator _configuration;
         public FolderMaker(string configPath)
         {
-            /**
-             * Считываем конфигурацию из файла 'config.json'
-             */
-            string jsonString = File.ReadAllText(configPath);
-            configuration = JsonSerializer.Deserialize<Configurator>(jsonString);
+            var jsonString = File.ReadAllText(configPath);
+            _configuration = JsonSerializer.Deserialize<Configurator>(jsonString);
         }
 
         private static void CreateFolder(string path, string name)
         {
-            /*
-             * Создание подпапки с именем name в папке path.
-             */
             path = Path.Join(path.AsSpan(), name.AsSpan());
             try
             {
@@ -39,9 +29,6 @@ namespace FolderMakerUtility
 
         private static void DeleteFolder(string path)
         {
-            /**
-             * Безвозвратное рекурсивное удаление папки, переданной в параметре path
-             */
             try
             {
                 Directory.Delete(path, true);
@@ -52,34 +39,25 @@ namespace FolderMakerUtility
                 Console.WriteLine($"Попытка удаления папки {path} завершилась с ошибкой: {e.Message}");
             }
         }
-
+ 
         private static bool IsFolderEmpty(string path)
         {
-            /**
-             * Проверка наличия файлов и папок в указанной директории
-             */
-            string[] files = Directory.GetFiles(path);
-            string[] folders = Directory.GetDirectories(path);
+            
+            var files = Directory.GetFiles(path);
+            var folders = Directory.GetDirectories(path);
 
             if (files.Length == 0 && folders.Length == 0)
             {
                 Console.WriteLine($"В папке {path} нет ничего.");
                 return true;
             }
-            else
-            {
-                Console.WriteLine($"В папке {path} есть содержимое.");
-                return false;
-            }
+
+            Console.WriteLine($"В папке {path} есть содержимое.");
+            return false;
         }
 
         private bool IsFolderOld(string directoryPath, string subdirectoryPath, DateTime currentDate)
         {
-            /**
-             * Проверка того, считается ли папка подлежащей удалению из-за срока давности, указанного в параметере SavePeriod
-             * Исхожу из соображения, что имя папки создается с именем даты в неком формате.
-             */
-            
             directoryPath += Configurator.GetOsType() == "Windows" ? @"\" : @"/";
             
             var folderDate = subdirectoryPath.Replace(directoryPath, "");
@@ -89,7 +67,7 @@ namespace FolderMakerUtility
                 var oldDate = DateTime.Parse(folderDate);
                 var delta = (currentDate - oldDate).TotalDays;
 
-                if (delta > configuration.SavePeriod)
+                if (delta > _configuration.SavePeriod)
                 {
                     Console.WriteLine($"Обнаружена старая папка, {subdirectoryPath}");
                     return true;
@@ -105,13 +83,10 @@ namespace FolderMakerUtility
 
         public void Start()
         {
-            /*
-             * Входная точка в приложение, единственный публичный метод класса.
-             */
             var currentDateTime = DateTime.Now;
-            var newFolderName = currentDateTime.ToString(configuration.FolderMask);
+            var newFolderName = currentDateTime.ToString(_configuration.FolderMask);
 
-            var folders = Directory.GetDirectories(configuration.Path);
+            var folders = Directory.GetDirectories(_configuration.Path);
             var isTheDirectoryInPlace = false;
 
             foreach (var item in folders)
@@ -119,9 +94,9 @@ namespace FolderMakerUtility
                 var alreadyExists = item.Contains(newFolderName);
                 isTheDirectoryInPlace = (isTheDirectoryInPlace || alreadyExists);
                 var isEmpty = IsFolderEmpty(item);
-                var isOld = IsFolderOld(configuration.Path, item, currentDateTime);
+                var isOld = IsFolderOld(_configuration.Path, item, currentDateTime);
 
-                var isPermittedToDelete = (isEmpty && configuration.DeleteEmpty && !alreadyExists) | (isOld && configuration.DeleteOlder);
+                var isPermittedToDelete = (isEmpty && _configuration.DeleteEmpty && !alreadyExists) | (isOld && _configuration.DeleteOlder);
                 if (isPermittedToDelete)
                 {
                     DeleteFolder(item);
@@ -130,7 +105,7 @@ namespace FolderMakerUtility
 
             if (!isTheDirectoryInPlace)
             {
-                CreateFolder(configuration.Path, newFolderName);
+                CreateFolder(_configuration.Path, newFolderName);
             }
         }
     }

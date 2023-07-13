@@ -6,12 +6,15 @@ using System.Text;
 
 namespace FolderMakerUtility
 {
+    /// <summary>
+    /// Read json-config file
+    /// </summary>
+    /// <remarks>
+    /// Requires 'config.json in the root app directory.
+    /// PASTE IT THERE MANUALLY
+    /// </remarks>
     internal class Configurator
     {
-        /**
-         * Класс для чтения в него информации из json-конфига. Запускается из конструктора класса FolderMaker
-         * Требует наличия файла конфигурации 'config.json' в корне приложения.
-         */
         public string Path { get; set; }
 
         public bool DeleteEmpty { get; set; }
