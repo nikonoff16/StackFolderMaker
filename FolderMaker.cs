@@ -25,7 +25,7 @@ namespace FolderMakerUtility
             /*
              * Создание подпапки с именем name в папке path.
              */
-            path = String.Join('\\', path, name);
+            path = Path.Join(path.AsSpan(), name.AsSpan());
             try
             {
                 Directory.CreateDirectory(path);
@@ -79,7 +79,9 @@ namespace FolderMakerUtility
              * Проверка того, считается ли папка подлежащей удалению из-за срока давности, указанного в параметере SavePeriod
              * Исхожу из соображения, что имя папки создается с именем даты в неком формате.
              */
-            directoryPath += @"\";
+            
+            directoryPath += Configurator.GetOsType() == "Windows" ? @"\" : @"/";
+            
             var folderDate = subdirectoryPath.Replace(directoryPath, "");
 
             try

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -17,5 +18,21 @@ namespace FolderMakerUtility
         public string FolderMask { get; set; }
         public bool DeleteOlder { get; set; }
         public double SavePeriod { get; set; }
+
+        public static string GetOsType()
+        {
+            var result = "";
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                result = "Windows";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                result = "Linux";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                result = "MacOS";
+            }
+            
+            return result;
+        }
     }
 }
