@@ -2,6 +2,6 @@
   "DeleteEmpty": true,
   "DeleteOlder": false,
   "FolderMask": "yyyy-MM-dd",
-  "Path": "/Users/joseph/Downloads/Filestack/2023-07-09/TestStackFolderMaker",
+  "Path": "/Users/joseph/Downloads/Filestack",
   "SavePeriod": 60.0
 }

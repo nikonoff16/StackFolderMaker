@@ -12,39 +12,13 @@ namespace FolderMakerUtility
             var jsonString = File.ReadAllText(configPath);
             _configuration = JsonSerializer.Deserialize<Configurator>(jsonString);
         }
-
-        private static void CreateFolder(string path, string name)
-        {
-            path = Path.Join(path.AsSpan(), name.AsSpan());
-            try
-            {
-                Directory.CreateDirectory(path);
-                Console.WriteLine($"Папка {name} была создана в {path}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Попытка создания папки {name} завершилась с ошибкой: {e.Message}");
-            }
-        }
-
-        private static void DeleteFolder(string path)
-        {
-            try
-            {
-                Directory.Delete(path, true);
-                Console.WriteLine($"Папка {path} удалена.");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Попытка удаления папки {path} завершилась с ошибкой: {e.Message}");
-            }
-        }
+        
  
-        private static bool IsFolderEmpty(string path)
+        private static bool IsFolderEmpty(DirectoryInfo path)
         {
             
-            var files = Directory.GetFiles(path);
-            var folders = Directory.GetDirectories(path);
+            var files = path.GetFiles();
+            var folders = path.GetDirectories();
 
             if (files.Length == 0 && folders.Length == 0)
             {
@@ -56,15 +30,11 @@ namespace FolderMakerUtility
             return false;
         }
 
-        private bool IsFolderOld(string directoryPath, string subdirectoryPath, DateTime currentDate)
+        private bool IsFolderOld(DirectoryInfo subdirectoryPath, DateTime currentDate)
         {
-            directoryPath += Configurator.GetOsType() == "Windows" ? @"\" : @"/";
-            
-            var folderDate = subdirectoryPath.Replace(directoryPath, "");
-
             try
             {
-                var oldDate = DateTime.Parse(folderDate);
+                var oldDate = DateTime.Parse(subdirectoryPath.Name);
                 var delta = (currentDate - oldDate).TotalDays;
 
                 if (delta > _configuration.SavePeriod)
@@ -75,7 +45,7 @@ namespace FolderMakerUtility
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Папка {folderDate} не относится к сгенерированным автоматически ({e}.");
+                Console.WriteLine($"Папка {subdirectoryPath.Name} не относится к сгенерированным автоматически ({e}.");
                 return false;
             }
             return false;
@@ -86,26 +56,28 @@ namespace FolderMakerUtility
             var currentDateTime = DateTime.Now;
             var newFolderName = currentDateTime.ToString(_configuration.FolderMask);
 
-            var folders = Directory.GetDirectories(_configuration.Path);
+            var rootDirectoryInfo = new DirectoryInfo(_configuration.Path);
+
+            var folders = rootDirectoryInfo.GetDirectories();
             var isTheDirectoryInPlace = false;
 
             foreach (var item in folders)
             {
-                var alreadyExists = item.Contains(newFolderName);
+                var alreadyExists = item.Name == newFolderName;
                 isTheDirectoryInPlace = (isTheDirectoryInPlace || alreadyExists);
                 var isEmpty = IsFolderEmpty(item);
-                var isOld = IsFolderOld(_configuration.Path, item, currentDateTime);
+                var isOld = IsFolderOld(item, currentDateTime);
 
                 var isPermittedToDelete = (isEmpty && _configuration.DeleteEmpty && !alreadyExists) | (isOld && _configuration.DeleteOlder);
                 if (isPermittedToDelete)
                 {
-                    DeleteFolder(item);
+                    item.Delete();
                 }
             }
 
             if (!isTheDirectoryInPlace)
             {
-                CreateFolder(_configuration.Path, newFolderName);
+                rootDirectoryInfo.CreateSubdirectory(newFolderName);
             }
         }
     }
